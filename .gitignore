@@ -1,0 +1,11 @@
+venv/
+__pycache__/
+*.pyc
+db.sqlite3
+.env
+static/
+error.log
+output.txt
+.vscode/
+ml_models/*.pkl
+ml_models/*.sav
