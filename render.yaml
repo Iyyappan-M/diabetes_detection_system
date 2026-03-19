@@ -3,7 +3,7 @@ services:
     name: diabetes-detection-system
     runtime: python
     buildCommand: "./build.sh"
-    startCommand: "gunicorn diabetes_detection_system.wsgi"
+    startCommand: "gunicorn diabetes_detection_system.wsgi:application"
     envVars:
       - key: DATABASE_URL
         fromDatabase:
