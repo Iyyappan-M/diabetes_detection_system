@@ -7,5 +7,3 @@ static/
 error.log
 output.txt
 .vscode/
-ml_models/*.pkl
-ml_models/*.sav
