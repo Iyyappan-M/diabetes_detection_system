@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+
+{% block title %}Diabetes Prediction{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7">
+            <div class="card border-0 shadow-lg overflow-hidden" style="border-radius: 20px;">
+                <div class="card-header bg-gradient-primary text-white py-4 text-center border-0" style="background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);">
+                    <h3 class="mb-0 fw-bold"><i class="bi bi-heart-pulse-fill me-2"></i>Diabetes Health Check</h3>
+                    <p class="mb-0 small opacity-75">Advanced AI Prediction System</p>
+                </div>
+                <div class="card-body p-4 p-md-5">
+                    {% if error %}
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ error }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    {% endif %}
+
+                    <form method="POST" id="predictForm" class="needs-validation">
+                        {% csrf_token %}
+                        
+                        <!-- Gender Selection -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-dark"><i class="bi bi-person-circle me-2"></i>Select Gender</label>
+                            <div class="d-flex gap-4 p-3 bg-light rounded-3 border">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="gender" id="male" value="Male" required onchange="togglePregnancy()">
+                                    <label class="form-check-label fw-semibold" for="male">Male</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="gender" id="female" value="Female" required onchange="togglePregnancy()">
+                                    <label class="form-check-label fw-semibold" for="female">Female</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row g-4">
+                            <!-- Pregnancies (Conditional) -->
+                            <div class="col-md-12 animate-fade" id="pregnancyField" style="display: none;">
+                                <div class="form-floating">
+                                    <input type="number" id="pregnancyInput" name="pregnancies" class="form-control" placeholder="0" min="0">
+                                    <label for="pregnancyInput">Number of Pregnancies</label>
+                                </div>
+                            </div>
+
+                            <!-- Health Metrics -->
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="number" name="glucose" step="0.1" class="form-control" id="glucose" placeholder="mg/dL" required min="0">
+                                    <label for="glucose">Glucose Level (mg/dL)</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="number" name="blood_pressure" step="0.1" class="form-control" id="bp" placeholder="mm Hg" required min="0">
+                                    <label for="bp">Blood Pressure (mm Hg)</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="number" name="insulin" step="0.1" class="form-control" id="insulin" placeholder="mu U/ml" required min="0">
+                                    <label for="insulin">Insulin Level (mu U/ml)</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="number" name="bmi" step="0.1" class="form-control" id="bmi" placeholder="kg/m²" required min="0">
+                                    <label for="bmi">BMI (Body Mass Index)</label>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-floating">
+                                    <input type="number" name="age" class="form-control" id="age" placeholder="Years" required min="0" max="120">
+                                    <label for="age">Current Age (Years)</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-grid mt-5">
+                            <button type="submit" class="btn btn-primary btn-lg rounded-pill shadow-sm hover-elevate py-3 fw-bold" id="submitBtn">
+                                <span class="btn-text">Predict Now</span>
+                                <div class="spinner-border spinner-border-sm ms-2 d-none" id="loader" role="status"></div>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function togglePregnancy() {
+        const isFemale = document.getElementById("female").checked;
+        const pregnancyField = document.getElementById("pregnancyField");
+        const pregnancyInput = document.getElementById("pregnancyInput");
+
+        if (isFemale) {
+            pregnancyField.style.display = "block";
+            pregnancyInput.required = true;
+        } else {
+            pregnancyField.style.display = "none";
+            pregnancyInput.required = false;
+            pregnancyInput.value = "0";
+        }
+    }
+
+    // Form Submission Animation & Validation
+    document.getElementById('predictForm').addEventListener('submit', function (e) {
+        if (!this.checkValidity()) {
+            e.preventDefault();
+            e.stopPropagation();
+        } else {
+            const btn = document.getElementById('submitBtn');
+            const loader = document.getElementById('loader');
+            const btnText = btn.querySelector('.btn-text');
+            
+            btn.disabled = true;
+            loader.classList.remove('d-none');
+            btnText.textContent = 'Analysing Data...';
+        }
+        this.classList.add('was-validated');
+    });
+</script>
+
+<style>
+    .form-control {
+        border: 1px solid #e0e0e0;
+        border-radius: 12px;
+        background-color: #f8f9fa;
+        transition: all 0.2s ease;
+    }
+    .form-control:focus {
+        background-color: #fff;
+        border-color: #4e73df;
+        box-shadow: 0 0 0 0.25rem rgba(78, 115, 223, 0.1);
+    }
+    .hover-elevate {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .hover-elevate:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(78, 115, 223, 0.3) !important;
+    }
+    .animate-fade {
+        animation: fadeIn 0.4s ease-out;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-5px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+{% endblock %}
